@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noví zákazníci — Diamond Plus</title>
+<style>
+:root {
+  --brand: #5C2450;
+  --brand-light: #7a3a6c;
+  --brand-dark: #3e1836;
+  --accent: #e6a817;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  --bg: #f4f5f7;
+  --card: #ffffff;
+  --text: #1e1e2f;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --sidebar-w: 260px;
+  --radius: 12px;
+  --color-guest: #3b82f6;
+  --color-newreg: #22c55e;
+  --color-partner: #9ca3af;
+}
+[data-theme="dark"] {
+  --bg: #0f1117;
+  --card: #1a1c25;
+  --text: #e4e4e7;
+  --text-muted: #9ca3af;
+  --border: #2d2f3a;
+  --brand-light: #9b6490;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  overflow-x: hidden;
+}
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, var(--brand-dark) 0%, var(--brand) 100%);
+  color: #fff;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  transition: transform .3s ease;
+  overflow-y: auto;
+}
+.sidebar-logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.sidebar-logo h2 { font-size: 16px; font-weight: 700; letter-spacing: .5px; }
+.sidebar-logo span { font-size: 11px; opacity: .65; display: block; margin-top: 2px; }
+.sidebar-reports { padding: 14px 0 0; }
+.sidebar-reports a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 24px;
+  color: rgba(255,255,255,.7);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: all .2s;
+}
+.sidebar-reports a:hover {
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  border-left-color: var(--accent);
+}
+.sidebar-reports a.report-active {
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  border-left-color: var(--accent);
+}
+.sidebar-reports a .report-emoji { font-size: 15px; flex-shrink: 0; width: 18px; text-align: center; }
+.sidebar-divider {
+  height: 1px;
+  background: rgba(255,255,255,.12);
+  margin: 10px 24px;
+}
+.sidebar-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,.4);
+  padding: 10px 24px 4px;
+}
+.sidebar-nav { padding: 4px 0; flex: 1; }
+.sidebar-nav a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 24px;
+  color: rgba(255,255,255,.65);
+  text-decoration: none;
+  font-size: 12.5px;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: all .2s;
+}
+.sidebar-nav a:hover {
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  border-left-color: var(--accent);
+}
+.sidebar-nav a .nav-emoji { font-size: 13px; width: 16px; text-align: center; flex-shrink: 0; }
+.sidebar-footer {
+  padding: 18px 24px;
+  border-top: 1px solid rgba(255,255,255,.12);
+  font-size: 11px; opacity: .5;
+}
+/* HAMBURGER */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 14px; left: 14px;
+  z-index: 200;
+  background: var(--brand);
+  border: none;
+  color: #fff;
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,.25);
+}
+.hamburger svg { width: 22px; height: 22px; }
+.overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 90;
+}
+/* MAIN */
+.main {
+  flex: 1;
+  margin-left: var(--sidebar-w);
+  padding: 32px 40px;
+  max-width: calc(100vw - 260px);
+  overflow-x: hidden;
+}
+/* HEADER */
+.header { margin-bottom: 32px; }
+.header h1 { font-size: 26px; font-weight: 700; color: var(--brand); }
+[data-theme="dark"] .header h1 { color: var(--brand-light); }
+.header .period { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+.header-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+.theme-toggle {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex; align-items: center; gap: 6px;
+}
+/* KPI CARDS */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 18px;
+  margin-bottom: 32px;
+}
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 4px; height: 100%;
+}
+.kpi-card.purple::before { background: var(--brand); }
+.kpi-card.gold::before { background: var(--accent); }
+.kpi-card.blue::before { background: var(--info); }
+.kpi-card.green::before { background: var(--success); }
+.kpi-card.red::before { background: var(--danger); }
+.kpi-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .7px; font-weight: 600; }
+.kpi-value { font-size: 32px; font-weight: 800; margin: 6px 0 2px; }
+.kpi-sub { font-size: 12.5px; color: var(--text-muted); }
+.kpi-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-top: 4px;
+}
+.badge-blue { background: #dbeafe; color: #1d4ed8; }
+.badge-green { background: #dcfce7; color: #15803d; }
+[data-theme="dark"] .badge-blue { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .badge-green { background: #14532d; color: #86efac; }
+/* SECTION */
+.section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* CHART CONTAINERS */
+.chart-container { width: 100%; overflow-x: auto; }
+.chart-container svg { display: block; margin: 0 auto; }
+/* LEGEND */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+  justify-content: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.legend-dot {
+  width: 12px; height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+/* TABLE */
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+.data-table thead th {
+  background: var(--brand);
+  color: #fff;
+  padding: 11px 14px;
+  text-align: right;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: .3px;
+  white-space: nowrap;
+}
+.data-table thead th:first-child { text-align: left; border-radius: 8px 0 0 0; }
+.data-table thead th:last-child { border-radius: 0 8px 0 0; }
+.data-table tbody tr { transition: background .15s; }
+.data-table tbody tr:hover { background: rgba(92,36,80,.04); }
+[data-theme="dark"] .data-table tbody tr:hover { background: rgba(92,36,80,.15); }
+.data-table tbody td {
+  padding: 10px 14px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.data-table tbody td:first-child { text-align: left; font-weight: 600; }
+.data-table tfoot td {
+  padding: 11px 14px;
+  text-align: right;
+  font-weight: 700;
+  background: rgba(92,36,80,.06);
+  border-top: 2px solid var(--brand);
+  font-size: 13px;
+}
+.data-table tfoot td:first-child { text-align: left; border-radius: 0 0 0 8px; }
+.data-table tfoot td:last-child { border-radius: 0 0 8px 0; }
+/* TREND BADGE */
+.trend-up { color: var(--success); font-weight: 700; }
+.trend-down { color: var(--danger); font-weight: 700; }
+.trend-flat { color: var(--text-muted); font-weight: 700; }
+/* ANALYSIS CARDS */
+.analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.analysis-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+.analysis-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--brand); }
+[data-theme="dark"] .analysis-card h4 { color: var(--brand-light); }
+.analysis-card p { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
+.analysis-card .big-num { font-size: 24px; font-weight: 800; color: var(--text); margin: 4px 0; }
+/* COMPARISON BAR */
+.comp-row { margin: 10px 0; }
+.comp-label { display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 5px; }
+.comp-track { width: 100%; height: 22px; background: var(--border); border-radius: 6px; overflow: hidden; display: flex; }
+.comp-fill-new { height: 100%; background: linear-gradient(90deg, var(--info), var(--success)); border-radius: 6px 0 0 6px; display: flex; align-items: center; padding-left: 8px; color: #fff; font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; }
+.comp-fill-partner { height: 100%; background: var(--color-partner); display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; color: #fff; font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; }
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .main { margin-left: 0; padding: 70px 20px 30px; max-width: 100vw; }
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .hamburger { display: flex; }
+  .overlay.open { display: block; }
+}
+</style>
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+  </svg>
+</button>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <h2>Diamond Plus</h2>
+    <span>WPJ Shop Analytics · 2026</span>
+  </div>
+  <nav class="sidebar-reports">
+    <a href="https://rkonfal.github.io/diamond-plus-portal/"><span class="report-emoji">🏠</span> Portál</a>
+    <a href="https://rkonfal.github.io/diamond-plus-report/"><span class="report-emoji">💰</span> Hospodaření</a>
+    <a href="https://rkonfal.github.io/inventory-dashboard/"><span class="report-emoji">📋</span> Sklad</a>
+    <a href="https://rkonfal.github.io/4px-kpi-dashboard/"><span class="report-emoji">📊</span> Expedice</a>
+    <a href="https://rkonfal.github.io/4px-carriers/"><span class="report-emoji">🚚</span> Přepravci</a>
+    <a href="https://rkonfal.github.io/eshop-dashboard/"><span class="report-emoji">🛒</span> E-shop</a>
+    <a href="https://rkonfal.github.io/4px-obalovy-material/"><span class="report-emoji">📦</span> Obaly</a>
+    <a href="https://rkonfal.github.io/balicky-dashboard/"><span class="report-emoji">🎁</span> Balíčky</a>
+    <a href="https://rkonfal.github.io/skupiny-dashboard/"><span class="report-emoji">👥</span> Skupiny</a>
+    <a href="https://rkonfal.github.io/expirace-dashboard/"><span class="report-emoji">⏰</span> Expirace</a>
+    <a href="https://rkonfal.github.io/novi-zakaznici/" class="report-active"><span class="report-emoji">👤</span> Noví zákazníci</a>
+  </nav>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section-label">Sekce stránky</div>
+  <nav class="sidebar-nav">
+    <a href="#kpi"><span class="nav-emoji">📌</span> Přehled KPI</a>
+    <a href="#weekly-bars"><span class="nav-emoji">📊</span> Týdenní objednávky</a>
+    <a href="#revenue-trend"><span class="nav-emoji">📈</span> Tržby</a>
+    <a href="#table"><span class="nav-emoji">📋</span> Týdenní tabulka</a>
+    <a href="#comparison"><span class="nav-emoji">⚖️</span> Srovnání</a>
+    <a href="#effectiveness"><span class="nav-emoji">🎯</span> Efektivita reklamy</a>
+  </nav>
+  <div class="sidebar-footer">
+    Data: WPJ Shop API<br>
+    Aktualizováno: duben 2026
+  </div>
+</aside>
+
+<main class="main">
+  <div class="header">
+    <div class="header-row">
+      <div>
+        <h1>👤 Noví zákazníci — Diamond Plus</h1>
+        <p class="period">Objednávky bez účtu / bez TiandeID &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; Zdroj: WPJ Shop API</p>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()">🌙 Tmavý režim</button>
+    </div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <section id="kpi">
+    <div class="kpi-grid">
+      <div class="kpi-card purple">
+        <div class="kpi-label">Celkem nových objednávek</div>
+        <div class="kpi-value">2 803</div>
+        <div class="kpi-sub">Host: 1 313 &nbsp;+&nbsp; Registrovaný: 1 490</div>
+        <span class="kpi-badge badge-blue">Bez TiandeID / bez účtu</span>
+      </div>
+      <div class="kpi-card gold">
+        <div class="kpi-label">Celkové tržby od nových</div>
+        <div class="kpi-value">3,30 M</div>
+        <div class="kpi-sub">3 303 864 Kč &nbsp;·&nbsp; 2026 YTD</div>
+        <span class="kpi-badge badge-green">z 51,56 M celkových tržeb</span>
+      </div>
+      <div class="kpi-card blue">
+        <div class="kpi-label">Průměrná objednávka</div>
+        <div class="kpi-value">1 178 Kč</div>
+        <div class="kpi-sub">Host: 1 093 Kč &nbsp;·&nbsp; Reg: 1 254 Kč</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">% z celkových tržeb</div>
+        <div class="kpi-value">6,4 %</div>
+        <div class="kpi-sub">2 803 z 35 472 objednávek (7,9 %)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STACKED BAR CHART: Weekly orders -->
+  <section class="section" id="weekly-bars">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;color:var(--brand)"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 17V13M12 17V9M16 17V5"/></svg>
+      Týdenní objednávky — hosté vs. noví registrovaní
+    </div>
+    <div class="chart-container">
+      <svg id="stackedBarChart" viewBox="0 0 820 360" style="width:100%;max-width:820px"></svg>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div> Host (bez účtu)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div> Nový registrovaný (bez TiandeID)</div>
+    </div>
+  </section>
+
+  <!-- REVENUE TREND LINE -->
+  <section class="section" id="revenue-trend">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;color:var(--brand)"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Tržby od nových zákazníků po týdnech (Kč)
+    </div>
+    <div class="chart-container">
+      <svg id="revenueLineChart" viewBox="0 0 820 300" style="width:100%;max-width:820px"></svg>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--brand);border-radius:50%"></div> Tržby od nových zákazníků (Kč)</div>
+    </div>
+  </section>
+
+  <!-- WEEKLY TABLE -->
+  <section class="section" id="table">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;color:var(--brand)"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      Týdenní přehled — noví zákazníci
+    </div>
+    <div style="overflow-x:auto">
+      <table class="data-table" id="weeklyTable">
+        <thead>
+          <tr>
+            <th>Týden</th>
+            <th>Hosté</th>
+            <th>Noví reg.</th>
+            <th>Celkem nových</th>
+            <th>Tržby nových (Kč)</th>
+            <th>Prům. objednávka</th>
+            <th>Partneři</th>
+            <th>% nových</th>
+          </tr>
+        </thead>
+        <tbody id="weeklyTbody"></tbody>
+        <tfoot id="weeklyTfoot"></tfoot>
+      </table>
+    </div>
+  </section>
+
+  <!-- COMPARISON CHART -->
+  <section class="section" id="comparison">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;color:var(--brand)"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Poměr: noví zákazníci vs. partneři (počty objednávek po týdnech)
+    </div>
+    <div id="comparisonBars"></div>
+  </section>
+
+  <!-- EFFECTIVENESS SECTION -->
+  <section class="section" id="effectiveness">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;color:var(--brand)"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Efektivita reklamy — trendy nových zákazníků
+    </div>
+    <div class="chart-container">
+      <svg id="trendLineChart" viewBox="0 0 820 280" style="width:100%;max-width:820px"></svg>
+    </div>
+    <div id="effectivenessAnalysis" class="analysis-grid"></div>
+  </section>
+
+</main>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+const weeklyData = [
+  { week:"2025-12-29", label:"W01 (29.12.)", guest:55, newReg:50, partner:684, all:789, guestRev:60980, newRegRev:57909 },
+  { week:"2026-01-05", label:"W02 (5.1.)",   guest:98, newReg:119, partner:2245, all:2462, guestRev:99440, newRegRev:137222 },
+  { week:"2026-01-12", label:"W03 (12.1.)",  guest:105, newReg:111, partner:2230, all:2446, guestRev:112558, newRegRev:135463 },
+  { week:"2026-01-19", label:"W04 (19.1.)",  guest:84,  newReg:92,  partner:1985, all:2161, guestRev:97014, newRegRev:129124 },
+  { week:"2026-01-26", label:"W05 (26.1.)",  guest:81,  newReg:80,  partner:2191, all:2352, guestRev:88474, newRegRev:112918 },
+  { week:"2026-02-02", label:"W06 (2.2.)",   guest:102, newReg:114, partner:2526, all:2742, guestRev:115059, newRegRev:144773 },
+  { week:"2026-02-09", label:"W07 (9.2.)",   guest:99,  newReg:109, partner:2363, all:2571, guestRev:107059, newRegRev:132696 },
+  { week:"2026-02-16", label:"W08 (16.2.)",  guest:117, newReg:99,  partner:2380, all:2596, guestRev:117127, newRegRev:124488 },
+  { week:"2026-02-23", label:"W09 (23.2.)",  guest:75,  newReg:108, partner:2462, all:2645, guestRev:83924, newRegRev:120501 },
+  { week:"2026-03-02", label:"W10 (2.3.)",   guest:96,  newReg:126, partner:2845, all:3067, guestRev:112793, newRegRev:156391 },
+  { week:"2026-03-09", label:"W11 (9.3.)",   guest:95,  newReg:129, partner:2344, all:2568, guestRev:116619, newRegRev:155197 },
+  { week:"2026-03-16", label:"W12 (16.3.)",  guest:82,  newReg:95,  partner:2493, all:2670, guestRev:92226, newRegRev:114974 },
+  { week:"2026-03-23", label:"W13 (23.3.)",  guest:92,  newReg:85,  partner:1975, all:2152, guestRev:106840, newRegRev:124325 },
+  { week:"2026-03-30", label:"W14 (30.3.)",  guest:58,  newReg:87,  partner:2240, all:2385, guestRev:62978, newRegRev:95532 },
+  { week:"2026-04-06", label:"W15 (6.4.)",   guest:74,  newReg:86,  partner:1706, all:1866, guestRev:83253, newRegRev:106007 },
+];
+
+// Derived
+weeklyData.forEach(w => {
+  w.totalNew = w.guest + w.newReg;
+  w.newRev = w.guestRev + w.newRegRev;
+  w.pctNew = (w.totalNew / w.all * 100);
+  w.avgNew = w.totalNew > 0 ? w.newRev / w.totalNew : 0;
+});
+
+const fmt = n => Math.round(n).toLocaleString('cs-CZ');
+const fmtK = n => n >= 1000000 ? (n/1000000).toFixed(2)+' M' : (n/1000).toFixed(0)+' tis.';
+
+// ── STACKED BAR CHART ─────────────────────────────────────────────────────
+function drawStackedBars() {
+  const svg = document.getElementById('stackedBarChart');
+  const W = 820, H = 360;
+  const pad = { top: 20, right: 20, bottom: 70, left: 60 };
+  const chartW = W - pad.left - pad.right;
+  const chartH = H - pad.top - pad.bottom;
+
+  const maxVal = Math.max(...weeklyData.map(w => w.totalNew)) * 1.2;
+  const barW = chartW / weeklyData.length * 0.65;
+  const barGap = chartW / weeklyData.length;
+
+  let html = `<defs>
+    <linearGradient id="gradGuest" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#60a5fa"/><stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="gradNewReg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4ade80"/><stop offset="100%" stop-color="#22c55e"/>
+    </linearGradient>
+  </defs>`;
+
+  // Grid lines
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + chartH - (i / 4) * chartH;
+    const v = Math.round((i / 4) * maxVal);
+    html += `<line x1="${pad.left}" y1="${y}" x2="${pad.left+chartW}" y2="${y}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,4"/>`;
+    html += `<text x="${pad.left-8}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--text-muted)">${v}</text>`;
+  }
+
+  // Bars
+  weeklyData.forEach((w, i) => {
+    const x = pad.left + i * barGap + (barGap - barW) / 2;
+    const guestH = (w.guest / maxVal) * chartH;
+    const regH = (w.newReg / maxVal) * chartH;
+
+    // newReg bottom
+    const newRegY = pad.top + chartH - regH;
+    html += `<rect x="${x}" y="${newRegY}" width="${barW}" height="${regH}" fill="url(#gradNewReg)" rx="2"/>`;
+    // guest on top
+    const guestY = newRegY - guestH;
+    html += `<rect x="${x}" y="${guestY}" width="${barW}" height="${guestH}" fill="url(#gradGuest)" rx="2 2 0 0"/>`;
+
+    // Total label
+    if (w.totalNew >= 10) {
+      html += `<text x="${x + barW/2}" y="${guestY - 5}" text-anchor="middle" font-size="10" font-weight="700" fill="var(--text-muted)">${w.totalNew}</text>`;
+    }
+
+    // X label
+    const lx = pad.left + i * barGap + barGap / 2;
+    const shortLabel = w.label.split(' ')[0];
+    html += `<text x="${lx}" y="${H - pad.bottom + 18}" text-anchor="middle" font-size="10" fill="var(--text-muted)" transform="rotate(-35,${lx},${H-pad.bottom+18})">${shortLabel}</text>`;
+  });
+
+  // Axes
+  html += `<line x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${pad.top+chartH}" stroke="var(--border)" stroke-width="1.5"/>`;
+  html += `<line x1="${pad.left}" y1="${pad.top+chartH}" x2="${pad.left+chartW}" y2="${pad.top+chartH}" stroke="var(--border)" stroke-width="1.5"/>`;
+
+  svg.innerHTML = html;
+}
+
+// ── REVENUE LINE CHART ────────────────────────────────────────────────────
+function drawRevenueLine() {
+  const svg = document.getElementById('revenueLineChart');
+  const W = 820, H = 300;
+  const pad = { top: 20, right: 20, bottom: 60, left: 80 };
+  const chartW = W - pad.left - pad.right;
+  const chartH = H - pad.top - pad.bottom;
+
+  const maxRev = Math.max(...weeklyData.map(w => w.newRev)) * 1.2;
+
+  const xPos = (i) => pad.left + i * (chartW / (weeklyData.length - 1));
+  const yPos = (v) => pad.top + chartH - (v / maxRev) * chartH;
+
+  // Grid
+  let html = `<defs>
+    <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5C2450" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#5C2450" stop-opacity="0"/>
+    </linearGradient>
+  </defs>`;
+
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + chartH - (i / 4) * chartH;
+    const v = (i / 4) * maxRev;
+    html += `<line x1="${pad.left}" y1="${y}" x2="${pad.left+chartW}" y2="${y}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,4"/>`;
+    html += `<text x="${pad.left-8}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--text-muted)">${fmtK(v)}</text>`;
+  }
+
+  // Area fill
+  let areaPath = `M ${xPos(0)} ${yPos(weeklyData[0].newRev)}`;
+  weeklyData.forEach((w, i) => {
+    if (i > 0) areaPath += ` L ${xPos(i)} ${yPos(w.newRev)}`;
+  });
+  areaPath += ` L ${xPos(weeklyData.length-1)} ${pad.top+chartH} L ${xPos(0)} ${pad.top+chartH} Z`;
+  html += `<path d="${areaPath}" fill="url(#areaGrad)"/>`;
+
+  // Line
+  let linePath = `M ${xPos(0)} ${yPos(weeklyData[0].newRev)}`;
+  weeklyData.forEach((w, i) => {
+    if (i > 0) linePath += ` L ${xPos(i)} ${yPos(w.newRev)}`;
+  });
+  html += `<path d="${linePath}" fill="none" stroke="var(--brand)" stroke-width="2.5"/>`;
+
+  // Dots + labels
+  weeklyData.forEach((w, i) => {
+    const cx = xPos(i), cy = yPos(w.newRev);
+    html += `<circle cx="${cx}" cy="${cy}" r="4" fill="var(--brand)" stroke="var(--card)" stroke-width="2"/>`;
+    if (i % 2 === 0) {
+      html += `<text x="${cx}" y="${cy-10}" text-anchor="middle" font-size="10" fill="var(--brand)" font-weight="600">${fmtK(w.newRev)}</text>`;
+    }
+    // X label
+    html += `<text x="${cx}" y="${H-pad.bottom+18}" text-anchor="middle" font-size="10" fill="var(--text-muted)" transform="rotate(-35,${cx},${H-pad.bottom+18})">${w.label.split(' ')[0]}</text>`;
+  });
+
+  // Axes
+  html += `<line x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${pad.top+chartH}" stroke="var(--border)" stroke-width="1.5"/>`;
+  html += `<line x1="${pad.left}" y1="${pad.top+chartH}" x2="${pad.left+chartW}" y2="${pad.top+chartH}" stroke="var(--border)" stroke-width="1.5"/>`;
+
+  svg.innerHTML = html;
+}
+
+// ── TREND LINE (effectiveness) ────────────────────────────────────────────
+function drawTrendLine() {
+  const svg = document.getElementById('trendLineChart');
+  const W = 820, H = 280;
+  const pad = { top: 30, right: 30, bottom: 60, left: 60 };
+  const chartW = W - pad.left - pad.right;
+  const chartH = H - pad.top - pad.bottom;
+
+  const maxVal = Math.max(...weeklyData.map(w => w.totalNew)) * 1.25;
+  const xPos = (i) => pad.left + i * (chartW / (weeklyData.length - 1));
+  const yPos = (v) => pad.top + chartH - (v / maxVal) * chartH;
+
+  // Trend line (linear regression)
+  const n = weeklyData.length;
+  const xs = weeklyData.map((_, i) => i);
+  const ys = weeklyData.map(w => w.totalNew);
+  const sumX = xs.reduce((a,b)=>a+b,0), sumY = ys.reduce((a,b)=>a+b,0);
+  const sumXY = xs.reduce((a,_,i)=>a+xs[i]*ys[i],0);
+  const sumX2 = xs.reduce((a,_,i)=>a+xs[i]*xs[i],0);
+  const slope = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
+  const intercept = (sumY - slope*sumX) / n;
+
+  let html = '';
+  // Grid
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + chartH - (i/4)*chartH;
+    html += `<line x1="${pad.left}" y1="${y}" x2="${pad.left+chartW}" y2="${y}" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,4"/>`;
+    html += `<text x="${pad.left-8}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--text-muted)">${Math.round((i/4)*maxVal)}</text>`;
+  }
+
+  // Guest area
+  let guestArea = `M ${xPos(0)} ${yPos(weeklyData[0].guest)}`;
+  weeklyData.forEach((w,i) => { if(i>0) guestArea += ` L ${xPos(i)} ${yPos(w.guest)}`; });
+  guestArea += ` L ${xPos(n-1)} ${pad.top+chartH} L ${xPos(0)} ${pad.top+chartH} Z`;
+  html += `<path d="${guestArea}" fill="#3b82f6" opacity="0.12"/>`;
+
+  // NewReg area
+  let regArea = `M ${xPos(0)} ${yPos(weeklyData[0].newReg)}`;
+  weeklyData.forEach((w,i) => { if(i>0) regArea += ` L ${xPos(i)} ${yPos(w.newReg)}`; });
+  regArea += ` L ${xPos(n-1)} ${pad.top+chartH} L ${xPos(0)} ${pad.top+chartH} Z`;
+  html += `<path d="${regArea}" fill="#22c55e" opacity="0.12"/>`;
+
+  // Guest line
+  let guestLine = `M ${xPos(0)} ${yPos(weeklyData[0].guest)}`;
+  weeklyData.forEach((w,i) => { if(i>0) guestLine += ` L ${xPos(i)} ${yPos(w.guest)}`; });
+  html += `<path d="${guestLine}" fill="none" stroke="#3b82f6" stroke-width="2"/>`;
+
+  // NewReg line
+  let regLine = `M ${xPos(0)} ${yPos(weeklyData[0].newReg)}`;
+  weeklyData.forEach((w,i) => { if(i>0) regLine += ` L ${xPos(i)} ${yPos(w.newReg)}`; });
+  html += `<path d="${regLine}" fill="none" stroke="#22c55e" stroke-width="2"/>`;
+
+  // Trend line (total new)
+  const trendY0 = yPos(intercept);
+  const trendY1 = yPos(intercept + slope*(n-1));
+  const trendColor = slope >= 0 ? '#22c55e' : '#ef4444';
+  html += `<line x1="${xPos(0)}" y1="${trendY0}" x2="${xPos(n-1)}" y2="${trendY1}" stroke="${trendColor}" stroke-width="2" stroke-dasharray="6,3"/>`;
+  const trendLabel = slope >= 0 ? `▲ Trend: +${Math.abs(slope).toFixed(1)}/týden` : `▼ Trend: ${slope.toFixed(1)}/týden`;
+  html += `<text x="${xPos(n-1)+5}" y="${trendY1+4}" font-size="11" font-weight="700" fill="${trendColor}">${trendLabel}</text>`;
+
+  // Dots
+  weeklyData.forEach((w, i) => {
+    html += `<circle cx="${xPos(i)}" cy="${yPos(w.totalNew)}" r="3.5" fill="var(--brand)" stroke="var(--card)" stroke-width="2"/>`;
+    html += `<text x="${xPos(i)}" y="${H-pad.bottom+18}" text-anchor="middle" font-size="10" fill="var(--text-muted)" transform="rotate(-35,${xPos(i)},${H-pad.bottom+18})">${w.label.split(' ')[0]}</text>`;
+  });
+
+  // Axes
+  html += `<line x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${pad.top+chartH}" stroke="var(--border)" stroke-width="1.5"/>`;
+  html += `<line x1="${pad.left}" y1="${pad.top+chartH}" x2="${pad.left+chartW}" y2="${pad.top+chartH}" stroke="var(--border)" stroke-width="1.5"/>`;
+
+  svg.innerHTML = html;
+}
+
+// ── WEEKLY TABLE ──────────────────────────────────────────────────────────
+function buildTable() {
+  const tbody = document.getElementById('weeklyTbody');
+  const tfoot = document.getElementById('weeklyTfoot');
+
+  let totGuest=0, totReg=0, totPartner=0, totAll=0, totRev=0;
+
+  tbody.innerHTML = weeklyData.map(w => {
+    totGuest += w.guest; totReg += w.newReg; totPartner += w.partner;
+    totAll += w.all; totRev += w.newRev;
+    const pct = w.pctNew;
+    const pctClass = pct >= 10 ? 'trend-up' : pct >= 7 ? '' : 'trend-down';
+    return `<tr>
+      <td>${w.label}</td>
+      <td><span style="color:#3b82f6;font-weight:600">${w.guest}</span></td>
+      <td><span style="color:#22c55e;font-weight:600">${w.newReg}</span></td>
+      <td style="font-weight:700">${w.totalNew}</td>
+      <td>${fmt(w.newRev)} Kč</td>
+      <td>${fmt(w.avgNew)} Kč</td>
+      <td style="color:var(--text-muted)">${fmt(w.partner)}</td>
+      <td class="${pctClass}">${pct.toFixed(1)} %</td>
+    </tr>`;
+  }).join('');
+
+  const totNew = totGuest + totReg;
+  const totPct = (totNew / totAll * 100).toFixed(1);
+  tfoot.innerHTML = `<tr>
+    <td>Celkem</td>
+    <td>${totGuest}</td>
+    <td>${totReg}</td>
+    <td>${totNew}</td>
+    <td>${fmt(totRev)} Kč</td>
+    <td>${fmt(totRev/totNew)} Kč</td>
+    <td>${fmt(totPartner)}</td>
+    <td>${totPct} %</td>
+  </tr>`;
+}
+
+// ── COMPARISON BARS ───────────────────────────────────────────────────────
+function buildComparison() {
+  const el = document.getElementById('comparisonBars');
+  el.innerHTML = weeklyData.map(w => {
+    const pctNew = (w.totalNew / w.all * 100).toFixed(1);
+    const pctPartner = (w.partner / w.all * 100).toFixed(1);
+    const wNew = (w.totalNew / w.all * 100);
+    const wPar = (w.partner / w.all * 100);
+    return `<div class="comp-row">
+      <div class="comp-label">
+        <span style="font-weight:600">${w.label}</span>
+        <span style="color:var(--text-muted);font-size:12px">Celkem: ${fmt(w.all)} objednávek</span>
+      </div>
+      <div class="comp-track">
+        <div class="comp-fill-new" style="width:${wNew}%">${pctNew}% noví (${w.totalNew})</div>
+        <div class="comp-fill-partner" style="width:${wPar}%">${pctPartner}% partneři (${w.partner})</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── EFFECTIVENESS ANALYSIS ────────────────────────────────────────────────
+function buildEffectiveness() {
+  const el = document.getElementById('effectivenessAnalysis');
+
+  // Simple stats
+  const totals = weeklyData.map(w => w.totalNew);
+  const avg = totals.reduce((a,b)=>a+b,0) / totals.length;
+  const first4avg = totals.slice(0,4).reduce((a,b)=>a+b,0)/4;
+  const last4avg = totals.slice(-4).reduce((a,b)=>a+b,0)/4;
+  const trend = last4avg - first4avg;
+  const trendPct = (trend / first4avg * 100).toFixed(1);
+
+  const bestWeek = weeklyData.reduce((a,b) => a.totalNew > b.totalNew ? a : b);
+  const worstWeek = weeklyData.reduce((a,b) => a.totalNew < b.totalNew ? a : b);
+
+  // Guest vs registered trend
+  const guestFirst = weeklyData.slice(1,5).reduce((a,b)=>a+b.guest,0)/4;
+  const guestLast = weeklyData.slice(-4).reduce((a,b)=>a+b.guest,0)/4;
+  const guestTrend = ((guestLast-guestFirst)/guestFirst*100).toFixed(0);
+
+  const regFirst = weeklyData.slice(1,5).reduce((a,b)=>a+b.newReg,0)/4;
+  const regLast = weeklyData.slice(-4).reduce((a,b)=>a+b.newReg,0)/4;
+  const regTrend = ((regLast-regFirst)/regFirst*100).toFixed(0);
+
+  el.innerHTML = `
+    <div class="analysis-card">
+      <h4>📈 Celkový trend</h4>
+      <div class="big-num" style="color:${trend>=0?'#22c55e':'#ef4444'}">${trend>=0?'+':''}${trendPct} %</div>
+      <p>Průměr prvních 4 týdnů (W02–W05): <strong>${first4avg.toFixed(0)}</strong> nových/týden<br>
+         Průměr posledních 4 týdnů: <strong>${last4avg.toFixed(0)}</strong> nových/týden<br>
+         ${trend >= 0 ? '✅ Akvizice roste' : '⚠️ Akvizice klesá'}</p>
+    </div>
+    <div class="analysis-card">
+      <h4>🏆 Nejlepší / nejhorší týden</h4>
+      <div class="big-num">${bestWeek.totalNew}</div>
+      <p>Nejlepší: <strong>${bestWeek.label}</strong> — ${bestWeek.totalNew} nových zákazníků<br>
+         Nejhorší: <strong>${worstWeek.label}</strong> — ${worstWeek.totalNew} nových zákazníků<br>
+         Průměr: <strong>${avg.toFixed(0)}</strong> nových/týden</p>
+    </div>
+    <div class="analysis-card">
+      <h4>👤 Host vs. Registrovaný trend</h4>
+      <div class="big-num" style="font-size:18px;color:#3b82f6">${guestTrend > 0 ? '+' : ''}${guestTrend}% hosté</div>
+      <p>Nákupy hostů (bez účtu): trend <strong>${guestTrend > 0 ? '↑' : '↓'} ${Math.abs(guestTrend)} %</strong><br>
+         Noví registrovaní: trend <strong>${regTrend > 0 ? '↑' : '↓'} ${Math.abs(regTrend)} %</strong><br>
+         ${regTrend > 0 ? '✅ Více nových zákazníků si zakládá účet' : '⚠️ Méně nových zákazníků si zakládá účet'}</p>
+    </div>
+    <div class="analysis-card">
+      <h4>💡 Doporučení</h4>
+      <p>Podíl nových zákazníků je stabilně <strong>~7–9 %</strong> všech objednávek.<br>
+         Průměrná objednávka nového zákazníka (<strong>~1 178 Kč</strong>) je nižší než průměr partnerů.<br>
+         ${trend >= 0 ? '✅ Reklamní kampaně fungují — akvizice roste.' : '⚠️ Zvažte posílení reklamních kampaní.'}</p>
+    </div>
+  `;
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+function init() {
+  drawStackedBars();
+  drawRevenueLine();
+  drawTrendLine();
+  buildTable();
+  buildComparison();
+  buildEffectiveness();
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+  // Redraw charts so SVG text colors update
+  drawStackedBars(); drawRevenueLine(); drawTrendLine();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+
+window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('resize', () => { drawStackedBars(); drawRevenueLine(); drawTrendLine(); });
+</script>
+</body>
+</html>
